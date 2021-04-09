@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import os, json
 import sys, traceback
 import docker
