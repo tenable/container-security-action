@@ -9,13 +9,13 @@ import requests
 
 def main():
 
-    access_key = int(os.environ["ACCESS_KEY"])
-    secret_key = int(os.environ["SECRET_KEY"])
+    access_key = str(os.environ["ACCESS_KEY"])
+    secret_key = str(os.environ["SECRET_KEY"])
     # risk_threshold = int(os.environ["RISK_THRESHOLD"])
     # findinds_threshold = int(os.environ["FINDINGS_THRESHOLD"])
     # malware_threshold = int(os.environ["MALWARE_THRESHOLD"])
-    image = int(os.environ["IMAGE_NAME"])
-    tag = int(os.environ["TAG_NAME"])
+    image = str(os.environ["INPUT_IMAGE_NAME"])
+    tag = str(os.environ["INPUT_TAG_NAME"])
 
     # try:
         # client = docker.from_env()

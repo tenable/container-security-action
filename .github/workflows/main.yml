@@ -16,8 +16,8 @@ jobs:
           image_name: cvetest
           tag_name: v1
         env:
-          access_key: ${{ secrets.ACCESS_KEY }}
-          secret_key: ${{ secrets.SECRET_KEY }}
+          ACCESS_KEY: ${{ secrets.ACCESS_KEY }}
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
       # Use the output from the `hello` step
       - name: Gets the risk score
         run: echo "The time was ${{ steps.consec.outputs.risk_score }}"
