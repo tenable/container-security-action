@@ -54,28 +54,29 @@ def main():
     findinds_threshold = int(os.environ["INPUT_FINDINGS_THRESHOLD"])
     malware_threshold = int(os.environ["INPUT_MALWARE_THRESHOLD"])
     block_builds = str(os.environ["INPUT_BLOCK_BUILDS"])
-    image = str(os.environ["INPUT_IMAGE_NAME"])
+    repository = str(os.environ["INPUT_REPO_NAME"])
+    image = repository.split("/")[1]
     tag = str(os.environ["INPUT_TAG_NAME"])
 
     url = f"https://cloud.tenable.com/container-security/api/v2/reports/library/{image}/{tag}"
 
-    # try:
-    #     client = docker.from_env()
-    #     login_response = client.login(username=access_key, password=secret_key, registry="registry.cloud.tenable.com")
-    #     if login_response["Status"] != "Login Succeeded":
-    #         print(login_response)
+    try:
+        client = docker.from_env()
+        login_response = client.login(username=access_key, password=secret_key, registry="registry.cloud.tenable.com")
+        if login_response["Status"] != "Login Succeeded":
+            print(login_response)
         
-    #     # Gets the image
-    #     image = client.images.get(f"{image}:{tag}")
+        # Gets the image
+        client_image = client.images.get(f"{repository}:{tag}")
         
-    #     # Tags and pushes he image
-    #     tagging_response = image.tag(f"registry.cloud.tenable.com/cvetest", tag=f"{tag}")
-    #     if not tagging_response:
-    #         print("Tagging failed")
-    #     print(client.images.push(f"registry.cloud.tenable.com/cvetest", tag=f"{tag}"))
+        # Tags and pushes he image
+        tagging_response = client_image.tag(f"registry.cloud.tenable.com/{image}", tag=f"{tag}")
+        if not tagging_response:
+            print("Tagging failed")
+        print(client.images.push(f"registry.cloud.tenable.com/{image}", tag=f"{tag}"))
     
-    # except (APIError,TLSParameterError) as e:
-    #     raise e    
+    except (APIError,TLSParameterError) as e:
+        raise e    
 
     response_dict = get_report(url, access_key, secret_key)
 

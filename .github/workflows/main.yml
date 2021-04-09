@@ -22,15 +22,17 @@ jobs:
             context: .
             push: false
             tags: user/app:latest
+            load: true
       - name: Runs the container security scan
         uses: ./ # Uses an action in the root directory
         id: consec
         with:
-          image_name: app
+          repo_name: user/app
           tag_name: latest
         env:
           ACCESS_KEY: ${{ secrets.ACCESS_KEY }}
           SECRET_KEY: ${{ secrets.SECRET_KEY }}
+      
       - name: Gets the risk score
         run: echo "The risk score ${{ steps.consec.outputs.risk_score }}"
       - name: Gets the risk scores for cves
