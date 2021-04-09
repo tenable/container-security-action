@@ -1,0 +1,13 @@
+name: "Tenable's Container security action"
+description: "Allows users to run a container scan off the shelf"
+author: "Gavin D'mello"
+inputs:
+  myInput:
+    description: "Input to use"
+    default: "world"
+outputs:
+  risk_score:
+    description: "Risk score for the container"
+runs:
+  using: "docker"
+  image: "Dockerfile"

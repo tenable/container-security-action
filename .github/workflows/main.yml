@@ -1,0 +1,19 @@
+on: [push]
+
+jobs:
+  test_job:
+    runs-on: ubuntu-latest
+    name: A job to run a container security scan
+    steps:
+      # To use this repository's private action,
+      # you must check out the repository
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Runs the container security scan
+        uses: ./ # Uses an action in the root directory
+        id: consec
+        with:
+          who-to-greet: 'Mona the Octocat'
+      # Use the output from the `hello` step
+      - name: Gets the risk score
+        run: echo "The time was ${{ steps.consec.outputs.risk_score }}"
