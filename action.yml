@@ -6,9 +6,27 @@ inputs:
     description: "Name of the image for analysis"
   tag_name:
     description: "Name of the tag associated with the image"
+  block_builds:
+    description: "If the user wants to block builds based on the threshold checks"
+    default: "false"
+  risk_threshold:
+    description: "The risk threshold defined by the user"
+    default: 0
+  findings_threshold:
+    description: "The findings threshold defined by the user"
+    default: 0
+  malware_threshold:
+    description: "The malware threshold defined by the user"
+    default: 0
 outputs:
   risk_score:
     description: "Risk score for the container"
+  number_of_findings:
+    description: "Numnber of vulnerability findings"
+  number_of_malware_findings:
+    description: "Number of malware findings"
+  cve_info:
+    description: "Information regarding the risk score associated with the cve"
 runs:
   using: "docker"
   image: "Dockerfile"

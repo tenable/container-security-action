@@ -14,10 +14,11 @@ jobs:
         id: consec
         with:
           image_name: cvetest
-          tag_name: v1
+          tag_name: latest
         env:
           ACCESS_KEY: ${{ secrets.ACCESS_KEY }}
           SECRET_KEY: ${{ secrets.SECRET_KEY }}
-      # Use the output from the `hello` step
       - name: Gets the risk score
-        run: echo "The time was ${{ steps.consec.outputs.risk_score }}"
+        run: echo "The risk score ${{ steps.consec.outputs.risk_score }}"
+      - name: Gets the risk scores for cves
+        run: echo "The cve information is ${{ steps.consec.outputs.cve_info }}"
