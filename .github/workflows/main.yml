@@ -13,7 +13,11 @@ jobs:
         uses: ./ # Uses an action in the root directory
         id: consec
         with:
-          who-to-greet: 'Mona the Octocat'
+          image_name: cvetest
+          tag_name: v1
+        env:
+          access_key: ${{ secrets.ACCESS_KEY }}
+          secret_key: ${{ secrets.SECRET_KEY }}
       # Use the output from the `hello` step
       - name: Gets the risk score
         run: echo "The time was ${{ steps.consec.outputs.risk_score }}"
