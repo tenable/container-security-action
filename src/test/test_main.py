@@ -1,5 +1,5 @@
 from  src.main import main
-
+from docker.errors import APIError, TLSParameterError
 import pytest, json, mock
 
 def test_get_cve_info_with_empty_findings():
@@ -87,3 +87,15 @@ def test_check_threshold_for_malware():
             0, 
             1
         )
+
+def test_push_docker_image_with_error():
+   
+    with pytest.raises(APIError):
+        main.push_docker_image("access_key", "secret", "registry", "repo/image", "image", "tag")
+
+@mock.patch("src.main.main.docker")
+def test_push_docker_image(mock_docker):
+   
+    main.push_docker_image("access_key", "secret", "registry", "repo/image", "image", "tag")
+    mock_docker.from_env.assert_called()
+    

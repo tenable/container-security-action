@@ -55,6 +55,28 @@ def check_threshold(risk_score, number_of_findings, number_of_malware_findings, 
     if number_of_malware_findings > findinds_threshold:
         raise ValueError("Malware found has exceeded threshold")
 
+def push_docker_image(access_key, secret_key, registry, repository, image, tag):
+    """
+    Pushes the docker image to the tenable registry
+    """
+    try:
+        client = docker.from_env()
+        login_response = client.login(username=access_key, password=secret_key, registry=registry)
+        if login_response["Status"] != "Login Succeeded":
+            print(login_response)
+        
+        # Gets the image
+        client_image = client.images.get(f"{repository}:{tag}")
+        
+        # Tags and pushes he image
+        tagging_response = client_image.tag(f"registry.cloud.tenable.com/{image}", tag=f"{tag}")
+        if not tagging_response:
+            print("Tagging failed")
+        client.images.push(f"registry.cloud.tenable.com/{image}", tag=f"{tag}")
+
+    except (APIError,TLSParameterError) as e:
+        raise e 
+
 def main():
 
     access_key = str(os.environ["ACCESS_KEY"])
@@ -67,26 +89,10 @@ def main():
     image = repository.split("/")[1]
     tag = str(os.environ["INPUT_TAG_NAME"])
 
-    url = f"https://cloud.tenable.com/container-security/api/v2/reports/library/{image}/{tag}"
+    registry = "registry.cloud.tenable.com"
+    url = f"https://cloud.tenable.com/container-security/api/v2/reports/library/{image}/{tag}"   
 
-    try:
-        client = docker.from_env()
-        login_response = client.login(username=access_key, password=secret_key, registry="registry.cloud.tenable.com")
-        if login_response["Status"] != "Login Succeeded":
-            print(login_response)
-        
-        # Gets the image
-        client_image = client.images.get(f"{repository}:{tag}")
-        
-        # Tags and pushes he image
-        tagging_response = client_image.tag(f"registry.cloud.tenable.com/{image}", tag=f"{tag}")
-        if not tagging_response:
-            print("Tagging failed")
-        print(client.images.push(f"registry.cloud.tenable.com/{image}", tag=f"{tag}"))
-    
-    except (APIError,TLSParameterError) as e:
-        raise e    
-
+    push_docker_image(access_key, secret_key, registry, repository, image, tag)
     response_dict = get_report(url, access_key, secret_key)
 
     number_of_findings = len(response_dict["findings"])
