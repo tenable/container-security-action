@@ -18,25 +18,34 @@ def get_cve_info(findings):
     
     return json.dumps(cve_info)
     
+
+def get_response(url, headers):
+    """
+    Gets the report response from the API
+    """
+    response = requests.request("GET", url, headers=headers)
+    response_dict = json.loads(response.text)
+    return response_dict
+
 def get_report(url, access_key, secret_key):
     """
     Gets the container scan report
     """
     headers = {"Accept": "application/json", "x-apikeys": f"accessKey={access_key};secretKey={secret_key}"}
+    response_dict = get_response(url, headers)
 
-    response = requests.request("GET", url, headers=headers)
-    response_dict = json.loads(response.text)
-    # print(response_dict)
-    
     while "status" in response_dict and response_dict["status"] == "error" and response_dict["message"] == "report_not_ready":
         print(response_dict["reason"])
         time.sleep(30)
-        response = requests.request("GET", url, headers=headers)
-        response_dict = json.loads(response.text)
+        response_dict = get_response(url, headers)
     
+    if "findings" not in response_dict or "risk_score" not in response_dict or "malware" not in response_dict:
+        raise ValueError("Finding, risk score or malware not returned")
+
     return response_dict
 
-def check_threshold(response, risk_score, number_of_findings, number_of_malware_findings, risk_threshold, findinds_threshold, malware_threshold):        
+def check_threshold(risk_score, number_of_findings, number_of_malware_findings, risk_threshold, findinds_threshold, malware_threshold):
+    risk_score = float(risk_score)       
     if risk_score > risk_threshold:
         raise ValueError("Risk score has exceeded threshold")
 
@@ -87,7 +96,7 @@ def main():
 
     # if block_builds is "true":
     #     # return as we don't need to check anything
-    #     check_threshold(response_dict, risk_score, number_of_findings, number_of_malware_findings, risk_threshold, findinds_threshold, malware_threshold)
+    #     check_threshold(risk_score, number_of_findings, number_of_malware_findings, risk_threshold, findinds_threshold, malware_threshold)
 
     print(f"::set-output name=risk_score::{risk_score}")
     print(f"::set-output name=number_of_findings::{number_of_findings}")
