@@ -1,2 +1,2 @@
 # container-security-action
-Container security action for Tenable.
+Tenable's Container security action
