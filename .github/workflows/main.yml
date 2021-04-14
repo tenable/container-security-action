@@ -9,9 +9,16 @@ jobs:
       # you must check out the repository
       - name: Checkout
         uses: actions/checkout@v2
-      -
-        name: Checkout
-        uses: actions/checkout@v2
+      - name: Running tests
+        run: |
+          echo "Installing app dependencies"
+          pip install -r requirements.txt
+          echo "Installing test dependencies"
+          pip install -r requirements-test.txt
+          echo "Setting python path"
+          export PYTHONPATH=.
+          echo "Running tests"
+          pytest tests/
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
       - name: Set up Docker Buildx
