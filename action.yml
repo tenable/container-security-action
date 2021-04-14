@@ -6,7 +6,7 @@ inputs:
     description: "Name of the repository which includes the image name"
   tag_name:
     description: "Name of the tag associated with the image"
-  block_builds:
+  check_thresholds:
     description: "If the user wants to block builds based on the threshold checks"
     default: "false"
   risk_threshold:

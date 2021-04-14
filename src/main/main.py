@@ -3,8 +3,13 @@ import os, json, time
 import sys, traceback
 import docker
 import requests
+import logging
 from docker.errors import APIError, TLSParameterError
 
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+stdoutHandler = logging.StreamHandler(sys.stdout)
+logger.addHandler(stdoutHandler)
 
 def get_cve_info(findings):
     """
@@ -35,7 +40,7 @@ def get_report(url, access_key, secret_key):
     response_dict = get_response(url, headers)
 
     while "status" in response_dict and response_dict["status"] == "error" and response_dict["message"] == "report_not_ready":
-        print(response_dict["reason"])
+        logger.info(response_dict["reason"])
         time.sleep(30)
         response_dict = get_response(url, headers)
     
@@ -63,7 +68,7 @@ def push_docker_image(access_key, secret_key, registry, repository, image, tag):
         client = docker.from_env()
         login_response = client.login(username=access_key, password=secret_key, registry=registry)
         if login_response["Status"] != "Login Succeeded":
-            print(login_response)
+            logger.error(login_response)
         
         # Gets the image
         client_image = client.images.get(f"{repository}:{tag}")
@@ -71,7 +76,7 @@ def push_docker_image(access_key, secret_key, registry, repository, image, tag):
         # Tags and pushes he image
         tagging_response = client_image.tag(f"registry.cloud.tenable.com/{image}", tag=f"{tag}")
         if not tagging_response:
-            print("Tagging failed")
+            logger.error("Tagging failed")
         client.images.push(f"registry.cloud.tenable.com/{image}", tag=f"{tag}")
 
     except (APIError,TLSParameterError) as e:
@@ -84,7 +89,7 @@ def main():
     risk_threshold = int(os.environ["INPUT_RISK_THRESHOLD"])
     findinds_threshold = int(os.environ["INPUT_FINDINGS_THRESHOLD"])
     malware_threshold = int(os.environ["INPUT_MALWARE_THRESHOLD"])
-    block_builds = str(os.environ["INPUT_BLOCK_BUILDS"])
+    check_thresholds = str(os.environ["INPUT_CHECK_THRESHOLDS"])
     repository = str(os.environ["INPUT_REPO_NAME"])
     image = repository.split("/")[1]
     tag = str(os.environ["INPUT_TAG_NAME"])
@@ -100,14 +105,20 @@ def main():
     number_of_malware_findings = len(response_dict["malware"])
     cve_info = get_cve_info(response_dict["findings"])
 
-    # if block_builds is "true":
-    #     # return as we don't need to check anything
-    #     check_threshold(risk_score, number_of_findings, number_of_malware_findings, risk_threshold, findinds_threshold, malware_threshold)
+    if check_thresholds is "true":
+        check_threshold(
+            risk_score, 
+            number_of_findings, 
+            number_of_malware_findings, 
+            risk_threshold, 
+            findinds_threshold, 
+            malware_threshold
+        )
 
-    print(f"::set-output name=risk_score::{risk_score}")
-    print(f"::set-output name=number_of_findings::{number_of_findings}")
-    print(f"::set-output name=number_of_malware_findings::{number_of_malware_findings}")
-    print(f"::set-output name=cve_info::{cve_info}")
+    logger.info(f"::set-output name=risk_score::{risk_score}")
+    logger.info(f"::set-output name=number_of_findings::{number_of_findings}")
+    logger.info(f"::set-output name=number_of_malware_findings::{number_of_malware_findings}")
+    logger.info(f"::set-output name=cve_info::{cve_info}")
 
 if __name__ == "__main__":
     main()
