@@ -34,6 +34,8 @@ jobs:
         with:
           repo_name: user/app
           tag_name: latest
+          check_thresholds: true
+          risk_threshold: 0
         env:
           ACCESS_KEY: ${{ secrets.ACCESS_KEY }}
           SECRET_KEY: ${{ secrets.SECRET_KEY }}
