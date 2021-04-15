@@ -5,8 +5,6 @@ jobs:
     runs-on: ubuntu-latest
     name: A job to run a container security scan
     steps:
-      # To use this repository's private action,
-      # you must check out the repository
       - name: Checkout
         uses: actions/checkout@v2
       - name: Running tests
@@ -31,7 +29,7 @@ jobs:
             tags: user/app:latest
             load: true
       - name: Runs the container security scan
-        uses: ./ # Uses an action in the root directory
+        uses: ./
         id: consec
         with:
           repo_name: user/app
