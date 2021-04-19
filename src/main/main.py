@@ -89,36 +89,40 @@ def main():
     risk_threshold = int(os.environ["INPUT_RISK_THRESHOLD"])
     findinds_threshold = int(os.environ["INPUT_FINDINGS_THRESHOLD"])
     malware_threshold = int(os.environ["INPUT_MALWARE_THRESHOLD"])
-    check_thresholds = str(os.environ["INPUT_CHECK_THRESHOLDS"])
     repository = str(os.environ["INPUT_REPO_NAME"])
     image = repository.split("/")[1]
     tag = str(os.environ["INPUT_TAG_NAME"])
+    check_thresholds = True if str(os.environ["INPUT_CHECK_THRESHOLDS"]) == "true" else False
+    wait_for_results = True if str(os.environ["INPUT_WAIT_FOR_RESULTS"]) == "true" else False
 
     registry = "registry.cloud.tenable.com"
     url = f"https://cloud.tenable.com/container-security/api/v2/reports/library/{image}/{tag}"   
 
     push_docker_image(access_key, secret_key, registry, repository, image, tag)
-    response_dict = get_report(url, access_key, secret_key)
+    if wait_for_results:
+        response_dict = get_report(url, access_key, secret_key)
 
-    number_of_findings = len(response_dict["findings"])
-    risk_score =  response_dict["risk_score"]
-    number_of_malware_findings = len(response_dict["malware"])
-    cve_info = get_cve_info(response_dict["findings"])
+        number_of_findings = len(response_dict["findings"])
+        risk_score =  response_dict["risk_score"]
+        number_of_malware_findings = len(response_dict["malware"])
+        cve_info = get_cve_info(response_dict["findings"])
 
-    if check_thresholds is "true":
-        check_threshold(
-            risk_score, 
-            number_of_findings, 
-            number_of_malware_findings, 
-            risk_threshold, 
-            findinds_threshold, 
-            malware_threshold
-        )
+        if check_thresholds:
+            check_threshold(
+                risk_score, 
+                number_of_findings, 
+                number_of_malware_findings, 
+                risk_threshold, 
+                findinds_threshold, 
+                malware_threshold
+            )
 
-    logger.info(f"::set-output name=risk_score::{risk_score}")
-    logger.info(f"::set-output name=number_of_findings::{number_of_findings}")
-    logger.info(f"::set-output name=number_of_malware_findings::{number_of_malware_findings}")
-    logger.info(f"::set-output name=cve_info::{cve_info}")
+        logger.info(f"::set-output name=risk_score::{risk_score}")
+        logger.info(f"::set-output name=number_of_findings::{number_of_findings}")
+        logger.info(f"::set-output name=number_of_malware_findings::{number_of_malware_findings}")
+        logger.info(f"::set-output name=cve_info::{cve_info}")
+    else:
+        logger.info("Kicking off scan and not waiting for results")
 
 if __name__ == "__main__":
     main()

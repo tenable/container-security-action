@@ -1,5 +1,5 @@
 # container-security-action
-Tenable's Container security action
+Tenable's Container security action ![Build](https://github.com/tenable/container-security-action/actions/workflows/main.yml/badge.svg)
 
 This action can be used to trigger a container security scan for your build images. The user must have a Tenable.io account and also a license for container security. The action will upload the image to the tenable registry which kicks off the scan. The detailed results for each scan can be found within the container security dashboard on Tenable.io.
 Users can specify thresholds within their workflows to enforce SLAs.

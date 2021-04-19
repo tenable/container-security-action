@@ -1,3 +1,4 @@
+name: Tests
 on: [push]
 
 jobs:
@@ -26,16 +27,15 @@ jobs:
         with:
             context: .
             push: false
-            tags: user/app:latest
+            tags: action/consec:latest
             load: true
       - name: Runs the container security scan
         uses: ./
         id: consec
         with:
-          repo_name: user/app
+          repo_name: action/consec
           tag_name: latest
-          check_thresholds: true
-          risk_threshold: 0
+          wait_for_results: true
         env:
           ACCESS_KEY: ${{ secrets.ACCESS_KEY }}
           SECRET_KEY: ${{ secrets.SECRET_KEY }}
