@@ -27,13 +27,13 @@ jobs:
         with:
             context: .
             push: false
-            tags: action/consec:latest
+            tags: actions/consec:latest
             load: true
       - name: Runs the container security scan
         uses: ./
         id: consec
         with:
-          repo_name: action/consec
+          repo_name: actions/consec
           tag_name: latest
           wait_for_results: true
         env:
