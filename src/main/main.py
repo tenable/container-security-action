@@ -92,8 +92,8 @@ def push_docker_image(access_key, secret_key, registry, repository, image, tag):
 
 
 def scan(repository, tag):
-    access_key = str(os.environ["ACCESS_KEY"])
-    secret_key = str(os.environ["SECRET_KEY"])
+    access_key = str(os.environ["TENABLE_ACCESS_KEY"])
+    secret_key = str(os.environ["TENABLE_SECRET_KEY"])
     risk_threshold = int(os.environ["INPUT_RISK_THRESHOLD"])
     findinds_threshold = int(os.environ["INPUT_FINDINGS_THRESHOLD"])
     malware_threshold = int(os.environ["INPUT_MALWARE_THRESHOLD"])
