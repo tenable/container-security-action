@@ -8,6 +8,7 @@ import traceback
 import docker
 import requests
 import logging
+import six
 from docker.errors import APIError, TLSParameterError
 
 logger = logging.getLogger()
